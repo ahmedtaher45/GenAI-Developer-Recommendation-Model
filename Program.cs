@@ -1,4 +1,8 @@
 
+using GenAI_Recommendation_Model.Models;
+using GenAI_Recommendation_Model.Services;
+using Microsoft.EntityFrameworkCore;
+
 namespace GenAI_Recommendation_Model
 {
     public class Program
@@ -8,11 +12,16 @@ namespace GenAI_Recommendation_Model
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<GenAIContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Gen")));
+
+            builder.Services.AddHttpClient<GptAssignmentService>();
 
             var app = builder.Build();
 
