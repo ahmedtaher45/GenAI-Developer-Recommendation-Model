@@ -8,7 +8,7 @@ namespace GenAI_Recommendation_Model.Services
     public class GptAssignmentService
     {
         private readonly HttpClient httpClient;
-        private readonly string apiKey = "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";
+        private readonly string apiKey = "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";
         private readonly string _model = "mistralai/mistral-7b-instruct:free";
 
         public GptAssignmentService(HttpClient httpClient)

@@ -63,11 +63,11 @@ namespace GenAI_Recommendation_Model.Controllers
 
             foreach (var dev in suitableDevs)
             {
-                promptBuilder.AppendLine($"- {dev.Name}, Score: {dev.Score}");
+                promptBuilder.AppendLine($"- {dev.Name}, Score: {dev.Score}, Ongoing Tasks: {dev.TaskCount}");
             }
 
             promptBuilder.AppendLine();
-            promptBuilder.AppendLine("From the developers listed, choose the most suitable one for the task.");
+            promptBuilder.AppendLine("Only consider developers with 4 or fewer ongoing tasks. Recommend the best one based on task difficulty and their score.");
             promptBuilder.AppendLine("Reply in this JSON format only: { \"name\": \"DeveloperName\", \"score\": DeveloperScore }");
 
             var prompt = promptBuilder.ToString();
