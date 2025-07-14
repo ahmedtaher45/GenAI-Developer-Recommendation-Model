@@ -22,8 +22,22 @@ namespace GenAI_Recommendation_Model
             options.UseSqlServer(builder.Configuration.GetConnectionString("Gen")));
 
             builder.Services.AddHttpClient<GptAssignmentService>();
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalhost",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4200")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
             var app = builder.Build();
+            app.UseCors(x => x
+               .AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

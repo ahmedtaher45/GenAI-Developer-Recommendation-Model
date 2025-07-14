@@ -9,6 +9,7 @@ namespace GenAI_Recommendation_Model.Models
         }
 
         public DbSet<Developer> Developers { get; set; }
+        public DbSet<TaskItem> Tasks { get; set; }
 
     }
 }
