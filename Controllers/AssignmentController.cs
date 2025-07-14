@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using GenAI_Recommendation_Model.DTOs;
 using GenAI_Recommendation_Model.Models;
 using GenAI_Recommendation_Model.Services;
@@ -54,8 +55,9 @@ namespace GenAI_Recommendation_Model.Controllers
             }
 
             var promptBuilder = new StringBuilder();
-            promptBuilder.AppendLine($"Task: {task.Description}");
-            promptBuilder.AppendLine($"Difficulty: {task.Difficulty}");
+            promptBuilder.AppendLine("You are a task assignment assistant.");
+            promptBuilder.AppendLine($"Task Description: {task.Description}");
+            promptBuilder.AppendLine($"Task Difficulty: {task.Difficulty}");
             promptBuilder.AppendLine("Available Developers:");
 
             foreach (var dev in suitableDevs)
@@ -63,19 +65,46 @@ namespace GenAI_Recommendation_Model.Controllers
                 promptBuilder.AppendLine($"- {dev.Name}, Score: {dev.Score}");
             }
 
-            promptBuilder.AppendLine("Recommend the best developer for this task and explain why.");
+            promptBuilder.AppendLine();
+            promptBuilder.AppendLine("From the developers listed, choose the most suitable one for the task.");
+            promptBuilder.AppendLine("Reply in this JSON format only: { \"name\": \"DeveloperName\", \"score\": DeveloperScore }");
 
-            string prompt = promptBuilder.ToString();
+            var prompt = promptBuilder.ToString();
 
             var aiReply = await gpt.GetDeveloperRecommendation(prompt);
+
+            string name = null;
+            int score = -1;
+
+            try
+            {
+                var json = JsonDocument.Parse(aiReply);
+                name = json.RootElement.GetProperty("name").GetString();
+                score = json.RootElement.GetProperty("score").GetInt32();
+            }
+            catch
+            {
+                return Ok(new
+                {
+                    task = task.Description,
+                    difficulty = task.Difficulty,
+                    message = "Failed to parse AI response.",
+                    rawAIReply = aiReply
+                });
+            }
 
             return Ok(new
             {
                 task = task.Description,
                 difficulty = task.Difficulty,
-                recommendation = aiReply
+                recommendedDeveloper = new
+                {
+                    name,
+                    score
+                }
             });
         }
+
 
     }
 }
